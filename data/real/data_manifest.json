@@ -1,0 +1,166 @@
+{
+  "project": "AI Flood Risk Mapping B12-FAIR-AI-12 \u2014 REAL DATA MODE",
+  "event": "Sen1Floods11 India 2016-08-12 (Assam/Brahmaputra valley)",
+  "event_date": "2016-08-12",
+  "rainfall_window": {
+    "start": "20160805",
+    "end": "20160812",
+    "aggregation": "daily sum + daily max of PRECTOTCORR"
+  },
+  "sentinel2_window_reference": [
+    "2016-08-01",
+    "2016-08-20"
+  ],
+  "sources": {
+    "flood_labels": {
+      "name": "Sen1Floods11 v1.1 hand-labelled LabelHand",
+      "access": "public GCS bucket gs://sen1floods11 via STAC https://storage.googleapis.com/sen1floods11/v1.1/catalog/sen1floods11_hand_labeled_label/collection.json",
+      "values": "-1 nodata (dropped), 0 land, 1 water",
+      "resolution_m": 10,
+      "crs": "EPSG:4326"
+    },
+    "rainfall": {
+      "name": "NASA POWER daily PRECTOTCORR (mm/day)",
+      "access": "keyless REST point API",
+      "native_resolution_deg": 0.5,
+      "note": "NOT GPM IMERG; IMERG path lives in gee/rainfall.js"
+    },
+    "elevation": {
+      "name": "SRTM v3 30m via OpenTopodata (no key)",
+      "slope": "finite-difference from SRTM grid (deg), same concept as ee.Terrain.slope"
+    },
+    "sentinel2": {
+      "status": "NOT retrieved \u2014 needs GEE/SciHub auth; band-math + export code in gee/sentinel_features.js"
+    }
+  },
+  "chips": {
+    "India_1072277": {
+      "bbox": [
+        93.04534117241815,
+        26.21643325174411,
+        93.09133491496507,
+        26.262426994291033
+      ],
+      "split": "train"
+    },
+    "India_981708": {
+      "bbox": [
+        93.78124105316886,
+        26.40040822193179,
+        93.82723479571578,
+        26.446401964478714
+      ],
+      "split": "train"
+    },
+    "Sri-Lanka_551926": {
+      "bbox": [
+        81.45491805059443,
+        7.9569174606170705,
+        81.50091179314136,
+        8.002911203163993
+      ],
+      "split": "train"
+    },
+    "Sri-Lanka_120804": {
+      "bbox": [
+        81.04097436767216,
+        7.634961262788634,
+        81.08696811021909,
+        7.680955005335557
+      ],
+      "split": "train"
+    },
+    "India_591317": {
+      "bbox": [
+        92.90735994477738,
+        26.584383192119468,
+        92.95335368732431,
+        26.63037693466639
+      ],
+      "split": "test"
+    },
+    "Sri-Lanka_233609": {
+      "bbox": [
+        81.08696811021908,
+        7.818936232976312,
+        81.132961852766,
+        7.864929975523235
+      ],
+      "split": "test"
+    }
+  },
+  "sampling": "every 6th pixel per 512x512 chip; nodata dropped",
+  "samples": {
+    "total": 42694,
+    "train": 28490,
+    "test": 14204,
+    "train_water_frac": 0.0584,
+    "test_water_frac": 0.2405
+  },
+  "features": [
+    "rainfall_sum",
+    "rainfall_max",
+    "elevation",
+    "slope",
+    "lowland_index"
+  ],
+  "target": "flooded (binary Sen1Floods11 observation); bands LOW/MED/HIGH via pre-declared P(flood) edges [0.33, 0.66]",
+  "split": "by chip (spatial): train chips vs held-out test chip; no adjacent-pixel split",
+  "model_comparison": [
+    {
+      "model": "LogisticRegression",
+      "bin_accuracy": 0.7533,
+      "bin_precision": 0.4927,
+      "bin_recall": 0.8753,
+      "bin_f1": 0.6305,
+      "roc_auc": 0.8749,
+      "pr_auc": 0.749,
+      "band_accuracy": 0.7097,
+      "band_f1_macro": 0.4723
+    },
+    {
+      "model": "RandomForest",
+      "bin_accuracy": 0.692,
+      "bin_precision": 0.3875,
+      "bin_recall": 0.4833,
+      "bin_f1": 0.4301,
+      "roc_auc": 0.7545,
+      "pr_auc": 0.3927,
+      "band_accuracy": 0.582,
+      "band_f1_macro": 0.3572
+    },
+    {
+      "model": "DecisionTree",
+      "bin_accuracy": 0.6797,
+      "bin_precision": 0.0427,
+      "bin_recall": 0.0155,
+      "bin_f1": 0.0228,
+      "roc_auc": 0.4525,
+      "pr_auc": 0.2375,
+      "band_accuracy": 0.6792,
+      "band_f1_macro": 0.277
+    }
+  ],
+  "best_model": "LogisticRegression",
+  "model_file": "C:\\Users\\Ankit\\Desktop\\SEM5\\AIML_PBL\\models\\real_flood_model.pkl",
+  "map": "C:\\Users\\Ankit\\Desktop\\SEM5\\AIML_PBL\\outputs\\maps\\real_flood_risk_map.html",
+  "processing_date": "2026-10-14",
+  "disclaimer": "Academic prototype using event-specific observations; not an operational flood-warning system.",
+  "india_grid": {
+    "boundary": "GADM v4.1 India level-0 (https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_IND_0.json)",
+    "step_deg": 0.1,
+    "cells": 27857,
+    "rain_mesh_step_deg": 1.0,
+    "rain_window": [
+      "20160805",
+      "20160812"
+    ],
+    "bands": {
+      "LOW": 21556,
+      "HIGH": 3766,
+      "MEDIUM": 2535
+    },
+    "s2_columns": "empty (NaN) \u2014 reserved for GEE backfill, never synthesised",
+    "slope_note": "forward differences on fetched SRTM set; coastal cells median-imputed"
+  }
+}

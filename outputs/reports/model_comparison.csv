@@ -1,0 +1,4 @@
+model,accuracy,precision_macro,recall_macro,f1_macro,cv_accuracy_5fold
+LogisticRegression,0.7667,0.7624,0.7667,0.7639,0.7367
+RandomForest,0.7233,0.7197,0.7233,0.7206,0.6833
+DecisionTree,0.63,0.6294,0.63,0.6296,0.5633

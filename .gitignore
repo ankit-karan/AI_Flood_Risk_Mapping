@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+# Virtual env
+venv/
+.venv/
+# Data (everything uploads; no secrets)
+!data/sample/.gitkeep
+# Env (never upload secrets)
+.env
+# PBL reports (DOCX/PDF) stay local — not uploaded to GitHub
+*.docx
+AI_Flood_Risk_Mapping_PBL_Report.pdf
+# Streamlit
+.streamlit/
+# OS
+.DS_Store
+Thumbs.db
+# IDE
+.vscode/
+.idea/
+# pytest
+.pytest_cache/
